@@ -36,29 +36,11 @@ app.register_blueprint(items_bp)
 
 @app.route("/", methods=["GET"])
 def home():
-    """
-    Welcome endpoint
-    ---
-    tags:
-      - System
-    responses:
-      200:
-        description: API is running
-    """
     return jsonify({"message": "Week3 Basic API is running", "docs": "/apidocs/"}), 200
 
 
 @app.route("/health", methods=["GET"])
 def health_check():
-    """
-    Health check endpoint
-    ---
-    tags:
-      - System
-    responses:
-      200:
-        description: Service health status
-    """
     return jsonify({"status": "ok"}), 200
 
 
