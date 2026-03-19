@@ -1,0 +1,189 @@
+openapi: 3.0.3
+info:
+  title: Week4 Book Management API
+  version: 1.0.0
+  description: OpenAPI specification for a simple book management API.
+servers:
+  - url: http://127.0.0.1:5007
+    description: Local development server
+paths:
+  /books:
+    get:
+      summary: Get all books
+      tags:
+        - Books
+      responses:
+        "200":
+          description: Book list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+    post:
+      summary: Create a new book
+      tags:
+        - Books
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewBook'
+      responses:
+        "201":
+          description: Book created
+          headers:
+            Location:
+              description: URI of the created resource
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        "400":
+          description: Invalid payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /books/{book_id}:
+    parameters:
+      - $ref: '#/components/parameters/BookId'
+    get:
+      summary: Get a book by ID
+      tags:
+        - Books
+      responses:
+        "200":
+          description: Book detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        "404":
+          description: Book not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update a book by ID
+      tags:
+        - Books
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBook'
+      responses:
+        "200":
+          description: Updated book
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        "400":
+          description: Invalid payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: Book not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete a book by ID
+      tags:
+        - Books
+      responses:
+        "204":
+          description: Book deleted
+        "404":
+          description: Book not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  parameters:
+    BookId:
+      name: book_id
+      in: path
+      required: true
+      description: Numeric identifier of the book
+      schema:
+        type: integer
+        minimum: 1
+
+  schemas:
+    Book:
+      type: object
+      required:
+        - id
+        - title
+        - author
+        - year
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Clean Code
+        author:
+          type: string
+          example: Robert C. Martin
+        year:
+          type: integer
+          example: 2008
+
+    NewBook:
+      type: object
+      required:
+        - title
+        - author
+        - year
+      properties:
+        title:
+          type: string
+          example: Domain-Driven Design
+        author:
+          type: string
+          example: Eric Evans
+        year:
+          type: integer
+          minimum: 0
+          example: 2003
+
+    UpdateBook:
+      type: object
+      minProperties: 1
+      properties:
+        title:
+          type: string
+          example: Refactoring (2nd Edition)
+        author:
+          type: string
+          example: Martin Fowler
+        year:
+          type: integer
+          minimum: 0
+          example: 2018
+
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          example: Book not found

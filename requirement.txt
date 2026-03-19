@@ -2,3 +2,4 @@ Flask
 requests
 flasgger
 PyJWT
+Werkzeug
