@@ -26,7 +26,7 @@ Từ thư mục gốc project:
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirement.txt
+pip install -r requirements.txt
 python week4/app.py
 ```
 
@@ -36,3 +36,28 @@ python week4/app.py
 - OpenAPI YAML: http://127.0.0.1:5007/openapi.yaml
 
 Bạn có thể chụp màn hình trang `/docs` để đính kèm khi nộp bài hoặc commit lên GitHub.
+
+## Deploy lên Vercel
+
+Project đã có sẵn cấu hình deploy:
+
+- `vercel.json`
+- `api/index.py` (entrypoint cho Vercel)
+- `requirements.txt`
+
+### Các bước
+
+1. Push code lên GitHub.
+2. Vào Vercel → **Add New Project** → Import repo GitHub.
+3. Ở phần Environment Variables, thêm:
+	- `FLASK_ENV=production`
+	- `FLASK_DEBUG=0`
+	- `JWT_SECRET=<secret-manh>`
+	- `JWT_ALGORITHM=HS256`
+	- `JWT_EXPIRE_MINUTES=60`
+4. Bấm **Deploy**.
+
+Sau khi deploy xong, mở:
+
+- `https://<your-vercel-domain>/docs`
+- `https://<your-vercel-domain>/openapi.yaml`
