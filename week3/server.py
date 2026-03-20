@@ -1,5 +1,6 @@
 from flask import Flask, jsonify
 from flasgger import Swagger
+import os
 
 try:
   from .auth import auth_bp
@@ -45,5 +46,7 @@ def health_check():
 
 
 if __name__ == "__main__":
-    print("Week3 Swagger Basic API running on http://127.0.0.1:5006/apidocs/")
-    app.run(port=5006, debug=True)
+    port = int(os.getenv("PORT", "5006"))
+    debug = os.getenv("FLASK_DEBUG", "0") == "1"
+    print(f"Week3 Swagger Basic API running on http://127.0.0.1:{port}/apidocs/")
+    app.run(port=port, debug=debug)

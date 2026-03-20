@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 from flask import Flask, jsonify, make_response, request, send_from_directory
 
@@ -146,5 +147,7 @@ def delete_book(book_id):
 
 
 if __name__ == "__main__":
-    print("Week4 Book API is running on http://127.0.0.1:5007/docs")
-    app.run(port=5007, debug=True)
+    port = int(os.getenv("PORT", "5007"))
+    debug = os.getenv("FLASK_DEBUG", "0") == "1"
+    print(f"Week4 Book API is running on http://127.0.0.1:{port}/docs")
+    app.run(port=port, debug=debug)

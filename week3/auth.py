@@ -1,13 +1,14 @@
 from datetime import datetime, timedelta, timezone
 from functools import wraps
+import os
 
 import jwt
 from flask import Blueprint, g, jsonify, request
 from werkzeug.security import check_password_hash, generate_password_hash
 
-JWT_SECRET = "week3-super-secret-key-at-least-32-bytes"
-JWT_ALGORITHM = "HS256"
-JWT_EXPIRE_MINUTES = 60
+JWT_SECRET = os.getenv("JWT_SECRET", "week3-super-secret-key-at-least-32-bytes")
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+JWT_EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRE_MINUTES", "60"))
 
 USERS = {
     "admin": {
