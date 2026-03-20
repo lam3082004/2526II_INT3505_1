@@ -1,0 +1,104 @@
+#%RAML 1.0
+
+title: Library Management API (RAML)
+version: v1
+baseUri: http://localhost:5007
+mediaType: application/json
+
+traits:
+  errorResponse:
+    responses:
+      400:
+        body:
+          properties:
+            error: string
+
+types:
+  Book:
+    type: object
+    properties:
+      id: integer
+      title: string
+      author: string
+      available: boolean
+
+  NewBook:
+    type: object
+    properties:
+      title: string
+      author: string
+    required: [title, author]
+
+  NewLoan:
+    type: object
+    properties:
+      bookId: integer
+      memberName: string
+    required: [bookId, memberName]
+
+  Loan:
+    type: object
+    properties:
+      id: integer
+      bookId: integer
+      memberName: string
+      borrowedAt: datetime
+
+/books:
+  get:
+    description: Lấy danh sách sách
+    responses:
+      200:
+        body:
+          type: Book[]
+
+  post:
+    description: Thêm sách mới
+    is: [errorResponse]
+    body:
+      type: NewBook
+    responses:
+      201:
+        body:
+          type: Book
+
+/books/{bookId}:
+  uriParameters:
+    bookId:
+      type: integer
+      minimum: 1
+  get:
+    description: Lấy chi tiết sách
+    responses:
+      200:
+        body:
+          type: Book
+      404:
+        body:
+          properties:
+            error: string
+
+/loans:
+  post:
+    description: Tạo phiếu mượn
+    is: [errorResponse]
+    body:
+      type: NewLoan
+    responses:
+      201:
+        body:
+          type: Loan
+
+/loans/{loanId}:
+  uriParameters:
+    loanId:
+      type: integer
+      minimum: 1
+  delete:
+    description: Trả sách (xóa phiếu mượn)
+    responses:
+      204:
+      404:
+        body:
+          properties:
+            error: string

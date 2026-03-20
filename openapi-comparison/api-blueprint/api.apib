@@ -1,0 +1,94 @@
+FORMAT: 1A
+HOST: http://localhost:5007
+
+# Library Management API (API Blueprint)
+
+Demo tài liệu API cho ứng dụng quản lý thư viện.
+
+# Group Books
+
+## Books Collection [/books]
+
+### Get all books [GET]
+
++ Response 200 (application/json)
+
+        [
+          { "id": 1, "title": "Dế Mèn Phiêu Lưu Ký", "author": "Tô Hoài", "available": true }
+        ]
+
+### Create a new book [POST]
+
++ Request (application/json)
+
+        {
+          "title": "Lão Hạc",
+          "author": "Nam Cao"
+        }
+
++ Response 201 (application/json)
+
+        {
+          "id": 2,
+          "title": "Lão Hạc",
+          "author": "Nam Cao",
+          "available": true
+        }
+
++ Response 400 (application/json)
+
+        { "error": "Invalid payload" }
+
+## Book Detail [/books/{bookId}]
+
++ Parameters
+    + bookId: 1 (number, required) - ID của sách
+
+### Get a book [GET]
+
++ Response 200 (application/json)
+
+        { "id": 1, "title": "Dế Mèn Phiêu Lưu Ký", "author": "Tô Hoài", "available": true }
+
++ Response 404 (application/json)
+
+        { "error": "Book not found" }
+
+# Group Loans
+
+## Loan Collection [/loans]
+
+### Create a loan [POST]
+
++ Request (application/json)
+
+        {
+          "bookId": 1,
+          "memberName": "Nguyen Van A"
+        }
+
++ Response 201 (application/json)
+
+        {
+          "id": 10,
+          "bookId": 1,
+          "memberName": "Nguyen Van A",
+          "borrowedAt": "2026-03-20T10:30:00Z"
+        }
+
++ Response 400 (application/json)
+
+        { "error": "Invalid payload" }
+
+## Loan Detail [/loans/{loanId}]
+
++ Parameters
+    + loanId: 10 (number, required) - ID phiếu mượn
+
+### Delete a loan (return book) [DELETE]
+
++ Response 204
+
++ Response 404 (application/json)
+
+        { "error": "Loan not found" }

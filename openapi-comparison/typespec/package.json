@@ -1,0 +1,14 @@
+{
+  "name": "library-typespec-demo",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tsp compile .",
+    "lint": "tsp compile . --warn-as-error"
+  },
+  "devDependencies": {
+    "@typespec/compiler": "latest",
+    "@typespec/http": "latest",
+    "@typespec/openapi3": "latest"
+  }
+}
