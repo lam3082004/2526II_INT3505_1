@@ -4,18 +4,20 @@ File chính: `openapi.yaml`
 
 ## Cài đặt
 
+Không cần cài global (`-g`) để tránh lỗi quyền `EACCES`.
+
 Chọn một trong hai cách:
 
 ### Cách 1: Redocly CLI
 
 ```bash
-npm install -g @redocly/cli
+npx --yes @redocly/cli@1 --version
 ```
 
 ### Cách 2: Prism (mock server)
 
 ```bash
-npm install -g @stoplight/prism-cli
+npx --yes @stoplight/prism-cli --version
 ```
 
 ## Chạy
@@ -23,7 +25,7 @@ npm install -g @stoplight/prism-cli
 ### Xem tài liệu trực tiếp
 
 ```bash
-redocly preview-docs openapi.yaml --port 8080
+npx --yes @redocly/cli@1 preview-docs openapi.yaml --port 8080
 ```
 
 Mở: `http://localhost:8080`
@@ -31,7 +33,7 @@ Mở: `http://localhost:8080`
 ### Chạy mock API từ spec
 
 ```bash
-prism mock openapi.yaml -p 4010
+npx --yes @stoplight/prism-cli mock openapi.yaml -p 4010
 ```
 
 Mở: `http://localhost:4010/books`
@@ -39,5 +41,5 @@ Mở: `http://localhost:4010/books`
 ## Kiểm tra nhanh
 
 ```bash
-redocly lint openapi.yaml
+npx --yes @redocly/cli@1 lint openapi.yaml
 ```

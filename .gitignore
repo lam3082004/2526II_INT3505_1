@@ -6,7 +6,7 @@ __pycache__/
 .venv/
 venv/
 env/
-
+/node_modules
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
@@ -27,3 +27,16 @@ build/
 .env
 .env.*
 !.env.example
+
+# Logs and local runtime files
+*.log
+*.pid
+
+# Vercel local metadata
+.vercel/
+
+# TypeSpec/OpenAPI generated artifacts
+openapi-comparison/typespec/node_modules/
+openapi-comparison/typespec/tsp-output/
+openapi-comparison/typespec/generated/
+openapi-comparison/api-blueprint/node_modules/

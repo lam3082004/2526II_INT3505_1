@@ -5,7 +5,6 @@ using TypeSpec.Http;
 
 @service(#{
   title: "Library Management API (TypeSpec)",
-  version: "1.0.0"
 })
 @server("http://localhost:5007", "Local server")
 namespace Library;

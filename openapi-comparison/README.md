@@ -36,3 +36,70 @@ Thư mục:
 - Cần viết tài liệu như Markdown, nhẹ nhàng: chọn **API Blueprint**.
 - Theo hướng design-first chặt chẽ với YAML thuần: chọn **RAML**.
 - Muốn định nghĩa kiểu mạnh, tái sử dụng cao, sinh OpenAPI từ source: chọn **TypeSpec**.
+- Luồng của TypeSpec trong bài này là: `main.tsp` → compile → `openapi.yaml` → sinh frontend/backend/docs.
+
+## 4) Chạy nhanh từng format (tối giản)
+
+### OpenAPI
+
+```bash
+cd openapi
+npx --yes @redocly/cli@1 preview-docs openapi.yaml --port 8080
+```
+
+Mở: `http://localhost:8080`
+
+### API Blueprint
+
+```bash
+cd api-blueprint
+npx aglio -i api.apib -s -p 8081
+```
+
+Mở: `http://localhost:8081`
+
+### RAML
+
+```bash
+cd raml
+raml2html api.raml > index.html
+python3 -m http.server 8082
+```
+
+Mở: `http://localhost:8082/index.html`
+
+### TypeSpec (TypeSec trong đề)
+
+```bash
+cd typespec
+npm run build
+npx --yes @redocly/cli@1 preview-docs tsp-output/openapi3/openapi.yaml --port 8083
+```
+
+Mở: `http://localhost:8083`
+
+## 5) Demo sinh code/test từ file tài liệu API
+
+Khuyến nghị dùng file OpenAPI làm chuẩn để sinh code/test:
+
+- File nguồn: `openapi/openapi.yaml`
+- Hoặc từ TypeSpec: build trước để ra `typespec/tsp-output/openapi3/openapi.yaml`
+
+### Sinh code client/server (OpenAPI Generator)
+
+```bash
+# Sinh Python FastAPI server
+npx --yes @openapitools/openapi-generator-cli generate -i openapi/openapi.yaml -g python-fastapi -o generated/server-fastapi
+
+# Sinh TypeScript client (axios)
+npx --yes @openapitools/openapi-generator-cli generate -i openapi/openapi.yaml -g typescript-axios -o generated/client-ts
+```
+
+### Sinh test hợp đồng API (Schemathesis)
+
+```bash
+pip install schemathesis
+schemathesis run openapi/openapi.yaml --base-url http://localhost:5007
+```
+
+Ý nghĩa: công cụ sẽ tự tạo nhiều test case từ schema để kiểm tra API thật có đúng hợp đồng hay không.
