@@ -1,0 +1,207 @@
+openapi: 3.0.3
+info:
+  title: Week7 Product API
+  version: 1.0.0
+  description: Product CRUD backend built from an OpenAPI specification and MongoDB/Mongoose.
+servers:
+  - url: http://127.0.0.1:5009
+    description: Local development server
+paths:
+  /products:
+    get:
+      summary: List products
+      tags:
+        - Products
+      responses:
+        "200":
+          description: Product list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+    post:
+      summary: Create a product
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewProduct'
+      responses:
+        "201":
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /products/{productId}:
+    parameters:
+      - $ref: '#/components/parameters/ProductId'
+    get:
+      summary: Get a product by ID
+      tags:
+        - Products
+      responses:
+        "200":
+          description: Product detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        "404":
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update a product by ID
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProduct'
+      responses:
+        "200":
+          description: Updated product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete a product by ID
+      tags:
+        - Products
+      responses:
+        "204":
+          description: Product deleted
+        "404":
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  parameters:
+    ProductId:
+      name: productId
+      in: path
+      required: true
+      description: MongoDB ObjectId of the product
+      schema:
+        type: string
+        pattern: '^[0-9a-fA-F]{24}$'
+  schemas:
+    Product:
+      type: object
+      required:
+        - id
+        - name
+        - price
+        - category
+        - stock
+      properties:
+        id:
+          type: string
+          example: 66d9e9e0b7f2f1c9c1d12345
+        name:
+          type: string
+          example: Mechanical Keyboard
+        description:
+          type: string
+          example: Compact keyboard with hot-swappable switches
+        price:
+          type: number
+          format: float
+          example: 79.99
+        category:
+          type: string
+          example: peripherals
+        stock:
+          type: integer
+          example: 25
+        imageUrl:
+          type: string
+          example: https://example.com/product.png
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    NewProduct:
+      type: object
+      required:
+        - name
+        - price
+        - category
+        - stock
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        price:
+          type: number
+          minimum: 0
+        category:
+          type: string
+          minLength: 1
+        stock:
+          type: integer
+          minimum: 0
+        imageUrl:
+          type: string
+    UpdateProduct:
+      type: object
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        price:
+          type: number
+          minimum: 0
+        category:
+          type: string
+          minLength: 1
+        stock:
+          type: integer
+          minimum: 0
+        imageUrl:
+          type: string
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string

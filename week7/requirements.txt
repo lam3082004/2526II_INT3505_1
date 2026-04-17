@@ -1,0 +1,5 @@
+Flask
+flasgger
+pymongo
+python-dotenv
+PyYAML
