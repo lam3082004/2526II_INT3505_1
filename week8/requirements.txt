@@ -1,0 +1,7 @@
+Flask
+flasgger
+pymongo
+python-dotenv
+PyYAML
+PyJWT
+Werkzeug

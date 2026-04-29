@@ -1,0 +1,311 @@
+swagger: "2.0"
+info:
+  title: Week8 Secure Product API
+  version: 1.0.0
+  description: Product CRUD with MongoDB and JWT protected write operations.
+basePath: /
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  BearerAuth:
+    type: apiKey
+    name: Authorization
+    in: header
+    description: "Format: Bearer <JWT_TOKEN>"
+tags:
+  - name: Auth
+  - name: Products
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user
+      tags:
+        - Auth
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/AuthRequest"
+      responses:
+        201:
+          description: Register success
+          schema:
+            $ref: "#/definitions/AuthMessage"
+        400:
+          description: Missing username or password
+          schema:
+            $ref: "#/definitions/Error"
+        409:
+          description: Username already exists
+          schema:
+            $ref: "#/definitions/Error"
+  /auth/login:
+    post:
+      summary: Login and get JWT token
+      tags:
+        - Auth
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/AuthRequest"
+      responses:
+        200:
+          description: Login success
+          schema:
+            $ref: "#/definitions/TokenResponse"
+        400:
+          description: Missing username or password
+          schema:
+            $ref: "#/definitions/Error"
+        401:
+          description: Invalid credentials
+          schema:
+            $ref: "#/definitions/Error"
+  /auth/me:
+    get:
+      summary: Get current authenticated user
+      tags:
+        - Auth
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Current user
+          schema:
+            type: object
+            required:
+              - username
+            properties:
+              username:
+                type: string
+        401:
+          description: Missing or invalid token
+          schema:
+            $ref: "#/definitions/Error"
+  /products:
+    get:
+      summary: List products
+      tags:
+        - Products
+      responses:
+        200:
+          description: Product list
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Product"
+    post:
+      summary: Create a product (requires JWT)
+      tags:
+        - Products
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/NewProduct"
+      responses:
+        201:
+          description: Product created
+          schema:
+            $ref: "#/definitions/Product"
+        400:
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/Error"
+        401:
+          description: Missing or invalid token
+          schema:
+            $ref: "#/definitions/Error"
+  /products/{productId}:
+    parameters:
+      - name: productId
+        in: path
+        required: true
+        type: string
+        pattern: "^[0-9a-fA-F]{24}$"
+        description: MongoDB ObjectId of the product
+    get:
+      summary: Get a product by ID
+      tags:
+        - Products
+      responses:
+        200:
+          description: Product detail
+          schema:
+            $ref: "#/definitions/Product"
+        404:
+          description: Product not found
+          schema:
+            $ref: "#/definitions/Error"
+    put:
+      summary: Update a product by ID (requires JWT)
+      tags:
+        - Products
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/UpdateProduct"
+      responses:
+        200:
+          description: Updated product
+          schema:
+            $ref: "#/definitions/Product"
+        400:
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/Error"
+        401:
+          description: Missing or invalid token
+          schema:
+            $ref: "#/definitions/Error"
+        404:
+          description: Product not found
+          schema:
+            $ref: "#/definitions/Error"
+    delete:
+      summary: Delete a product by ID (requires JWT)
+      tags:
+        - Products
+      security:
+        - BearerAuth: []
+      responses:
+        204:
+          description: Product deleted
+        401:
+          description: Missing or invalid token
+          schema:
+            $ref: "#/definitions/Error"
+        404:
+          description: Product not found
+          schema:
+            $ref: "#/definitions/Error"
+definitions:
+  Error:
+    type: object
+    required:
+      - error
+    properties:
+      error:
+        type: string
+  AuthRequest:
+    type: object
+    required:
+      - username
+      - password
+    properties:
+      username:
+        type: string
+        example: admin
+      password:
+        type: string
+        example: "123456"
+  AuthMessage:
+    type: object
+    required:
+      - message
+      - username
+    properties:
+      message:
+        type: string
+      username:
+        type: string
+  TokenResponse:
+    type: object
+    required:
+      - access_token
+      - token_type
+      - expires_in_minutes
+    properties:
+      access_token:
+        type: string
+      token_type:
+        type: string
+        example: Bearer
+      expires_in_minutes:
+        type: integer
+        example: 60
+  Product:
+    type: object
+    required:
+      - id
+      - name
+      - price
+      - category
+      - stock
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      description:
+        type: string
+      price:
+        type: number
+        format: float
+      category:
+        type: string
+      stock:
+        type: integer
+      imageUrl:
+        type: string
+      createdAt:
+        type: string
+      updatedAt:
+        type: string
+  NewProduct:
+    type: object
+    required:
+      - name
+      - price
+      - category
+      - stock
+    properties:
+      name:
+        type: string
+        minLength: 1
+      description:
+        type: string
+      price:
+        type: number
+        minimum: 0
+      category:
+        type: string
+        minLength: 1
+      stock:
+        type: integer
+        minimum: 0
+      imageUrl:
+        type: string
+  UpdateProduct:
+    type: object
+    properties:
+      name:
+        type: string
+        minLength: 1
+      description:
+        type: string
+      price:
+        type: number
+        minimum: 0
+      category:
+        type: string
+        minLength: 1
+      stock:
+        type: integer
+        minimum: 0
+      imageUrl:
+        type: string
