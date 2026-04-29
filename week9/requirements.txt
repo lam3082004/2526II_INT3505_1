@@ -1,0 +1,4 @@
+Flask
+flasgger
+python-dotenv
+PyYAML

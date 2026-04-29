@@ -1,0 +1,430 @@
+swagger: "2.0"
+info:
+  title: Week9 Payment API - Versioning & Lifecycle Management
+  version: 1.0.0
+  description: >
+    Payment API demonstrating 3 versioning strategies and lifecycle management.
+    - URL versioning: /api/v1/payments, /api/v2/payments
+    - Header versioning: /api/payments + X-API-Version header
+    - Query param versioning: /api/payments?version=1|2
+    
+    DEPRECATED: v1 will be sunset on 31 Jul 2026. Migrate to v2.
+basePath: /
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+tags:
+  - name: Lifecycle
+    description: API lifecycle and version info
+  - name: Payments v1
+    description: "DEPRECATED - use v2 instead"
+  - name: Payments v2
+    description: Current version with improved schema
+  - name: Payments (Header/Query)
+    description: Version-agnostic endpoints using header or query param
+
+paths:
+  /:
+    get:
+      summary: API home - available strategies
+      tags:
+        - Lifecycle
+      responses:
+        200:
+          description: Available versioning strategies
+          schema:
+            type: object
+
+  /health:
+    get:
+      summary: Health check
+      tags:
+        - Lifecycle
+      responses:
+        200:
+          description: Service is healthy
+
+  /api/lifecycle:
+    get:
+      summary: Get lifecycle info
+      tags:
+        - Lifecycle
+      description: Returns supported versions, deprecated versions, sunset date
+      responses:
+        200:
+          description: Lifecycle info
+          schema:
+            type: object
+            properties:
+              supported_versions:
+                type: array
+                items:
+                  type: string
+              deprecated_versions:
+                type: array
+                items:
+                  type: string
+              sunset:
+                type: object
+
+  /api/v1/payments:
+    post:
+      summary: "DEPRECATED - Create payment (v1)"
+      tags:
+        - Payments v1
+      description: |
+        **DEPRECATED** - Migrate to POST /api/v2/payments.
+        
+        Deprecation headers will be returned:
+        - Deprecation: true
+        - Sunset: Wed, 31 Jul 2026 23:59:59 GMT
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/PaymentV1Request"
+      responses:
+        201:
+          description: Payment created (v1 format)
+          schema:
+            $ref: "#/definitions/PaymentV1Response"
+        400:
+          description: Bad request
+          schema:
+            $ref: "#/definitions/Error"
+
+    get:
+      summary: "DEPRECATED - List payments (v1)"
+      tags:
+        - Payments v1
+      description: |
+        **DEPRECATED** - Migrate to GET /api/v2/payments.
+      responses:
+        200:
+          description: List of payments in v1 format
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/PaymentV1Response"
+
+  /api/v1/payments/{paymentId}:
+    parameters:
+      - name: paymentId
+        in: path
+        required: true
+        type: string
+        description: Payment UUID
+
+    get:
+      summary: "DEPRECATED - Get payment (v1)"
+      tags:
+        - Payments v1
+      responses:
+        200:
+          description: Payment detail in v1 format
+          schema:
+            $ref: "#/definitions/PaymentV1Response"
+        404:
+          description: Payment not found
+          schema:
+            $ref: "#/definitions/Error"
+
+    put:
+      summary: "DEPRECATED - Update payment (v1)"
+      tags:
+        - Payments v1
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/PaymentV1Request"
+      responses:
+        200:
+          description: Payment updated in v1 format
+          schema:
+            $ref: "#/definitions/PaymentV1Response"
+        404:
+          description: Payment not found
+          schema:
+            $ref: "#/definitions/Error"
+
+  /api/v2/payments:
+    post:
+      summary: Create payment (v2)
+      tags:
+        - Payments v2
+      description: |
+        Create a new payment with improved schema.
+        - Amounts in cents (integer) to avoid float precision issues
+        - Explicit currency field
+        - Structured method object
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/PaymentV2Request"
+      responses:
+        201:
+          description: Payment created (v2 format)
+          schema:
+            $ref: "#/definitions/PaymentV2Response"
+        400:
+          description: Bad request
+          schema:
+            $ref: "#/definitions/Error"
+
+    get:
+      summary: List payments (v2)
+      tags:
+        - Payments v2
+      responses:
+        200:
+          description: List of payments in v2 format
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/PaymentV2Response"
+
+  /api/v2/payments/{paymentId}:
+    parameters:
+      - name: paymentId
+        in: path
+        required: true
+        type: string
+        description: Payment UUID
+
+    get:
+      summary: Get payment (v2)
+      tags:
+        - Payments v2
+      responses:
+        200:
+          description: Payment detail in v2 format
+          schema:
+            $ref: "#/definitions/PaymentV2Response"
+        404:
+          description: Payment not found
+          schema:
+            $ref: "#/definitions/Error"
+
+    put:
+      summary: Update payment (v2)
+      tags:
+        - Payments v2
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/PaymentV2Request"
+      responses:
+        200:
+          description: Payment updated in v2 format
+          schema:
+            $ref: "#/definitions/PaymentV2Response"
+        404:
+          description: Payment not found
+          schema:
+            $ref: "#/definitions/Error"
+
+  /api/payments:
+    post:
+      summary: Create payment (version via header/query)
+      tags:
+        - Payments (Header/Query)
+      description: |
+        Create payment using version from:
+        - X-API-Version header (1 or 2)
+        - version query param (?version=1|2)
+        - Defaults to v1
+      parameters:
+        - name: X-API-Version
+          in: header
+          type: string
+          description: "API version: 1 or 2"
+        - name: version
+          in: query
+          type: string
+          description: "API version: 1 or 2"
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+      responses:
+        201:
+          description: Payment created
+          schema:
+            type: object
+        400:
+          description: Bad request
+          schema:
+            $ref: "#/definitions/Error"
+
+    get:
+      summary: List payments (version via header/query)
+      tags:
+        - Payments (Header/Query)
+      parameters:
+        - name: X-API-Version
+          in: header
+          type: string
+          description: "API version: 1 or 2"
+        - name: version
+          in: query
+          type: string
+          description: "API version: 1 or 2"
+      responses:
+        200:
+          description: List of payments
+          schema:
+            type: array
+            items:
+              type: object
+
+definitions:
+  Error:
+    type: object
+    required:
+      - error
+    properties:
+      error:
+        type: string
+        example: Invalid request
+
+  PaymentMethod:
+    type: object
+    required:
+      - type
+    properties:
+      type:
+        type: string
+        example: card
+        enum: [card, bank_transfer, wallet]
+
+  PaymentV1Request:
+    type: object
+    required:
+      - user_id
+      - amount
+      - payment_method
+    properties:
+      user_id:
+        type: string
+        minLength: 1
+        example: u01
+      amount:
+        type: number
+        minimum: 0.01
+        example: 12.50
+      payment_method:
+        type: string
+        minLength: 1
+        example: card
+
+  PaymentV1Response:
+    type: object
+    required:
+      - id
+      - user_id
+      - amount
+      - payment_method
+      - status
+      - created_at
+    properties:
+      id:
+        type: string
+        example: 550e8400-e29b-41d4-a716-446655440000
+      user_id:
+        type: string
+        example: u01
+      amount:
+        type: number
+        format: float
+        example: 12.50
+      payment_method:
+        type: string
+        example: card
+      status:
+        type: string
+        example: created
+      created_at:
+        type: string
+        format: date-time
+        example: "2026-04-29T10:30:45.123Z"
+
+  PaymentV2Money:
+    type: object
+    required:
+      - amount_cents
+      - currency
+    properties:
+      amount_cents:
+        type: integer
+        minimum: 1
+        example: 1250
+      currency:
+        type: string
+        pattern: "^[A-Z]{3}$"
+        example: USD
+
+  PaymentV2Request:
+    type: object
+    required:
+      - customer_id
+      - amount_cents
+      - currency
+      - method
+    properties:
+      customer_id:
+        type: string
+        minLength: 1
+        example: c01
+      amount_cents:
+        type: integer
+        minimum: 1
+        example: 1250
+      currency:
+        type: string
+        pattern: "^[A-Z]{3}$"
+        example: USD
+      method:
+        $ref: "#/definitions/PaymentMethod"
+
+  PaymentV2Response:
+    type: object
+    required:
+      - id
+      - customer_id
+      - money
+      - method
+      - status
+      - created_at
+    properties:
+      id:
+        type: string
+        example: 550e8400-e29b-41d4-a716-446655440000
+      customer_id:
+        type: string
+        example: c01
+      money:
+        $ref: "#/definitions/PaymentV2Money"
+      method:
+        $ref: "#/definitions/PaymentMethod"
+      status:
+        type: string
+        example: created
+      created_at:
+        type: string
+        format: date-time
+        example: "2026-04-29T10:30:45.123Z"
+      updated_at:
+        type: string
+        format: date-time
+        example: "2026-04-29T10:35:22.456Z"
