@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+  week10-api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "5012:5012"
+    environment:
+      PORT: 5012
+      FLASK_DEBUG: "0"
+      LOG_LEVEL: INFO
+      RATE_LIMIT_ENABLED: "1"
+      RATE_LIMIT_PER_MINUTE: "60"
+      CIRCUIT_BREAKER_ENABLED: "1"
+      CIRCUIT_BREAKER_FAILURE_THRESHOLD: "5"
+      CIRCUIT_BREAKER_RECOVERY_TIMEOUT: "60"
+      ENVIRONMENT: production
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5012/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s

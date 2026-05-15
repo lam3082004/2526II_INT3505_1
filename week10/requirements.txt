@@ -1,0 +1,7 @@
+Flask
+python-dotenv
+Flask-Limiter
+prometheus-client
+pybreaker
+python-json-logger
+requests
