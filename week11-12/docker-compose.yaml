@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+  week11-12-api:
+    image: python:3.11-slim
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: sh -c "pip install -r requirements.txt && python src/server.py"
+    ports:
+      - "5013:5013"
+    environment:
+      PORT: "5013"
+      FLASK_DEBUG: "0"
+      WEBHOOK_TIMEOUT_SECONDS: "3"
